@@ -31,8 +31,8 @@ class SubmitButton extends Button implements Nette\Forms\ISubmitterControl
 	/** @var array of function(SubmitButton $sender); Occurs when the button is clicked and form is not validated */
 	public $onInvalidClick;
 
-	/** @var mixed */
-	private $validationScope = TRUE;
+	/** @var array */
+	private $validationScope;
 
 
 
@@ -81,9 +81,22 @@ class SubmitButton extends Button implements Nette\Forms\ISubmitterControl
 	 */
 	public function setValidationScope($scope)
 	{
-		// TODO: implement groups
-		$this->validationScope = (bool) $scope;
-		$this->control->formnovalidate = !$this->validationScope;
+		$htmlNames = array();
+		if ($scope === TRUE || $scope === NULL) {
+			$this->validationScope = NULL;
+		} else {
+			$this->validationScope = array();
+			foreach ($scope ?: array() as $control) {
+				if (!$control instanceof Nette\Forms\Container && !$control instanceof Nette\Forms\IControl) {
+					throw new Nette\InvalidArgumentException('Validation scope accepts only Nette\Forms\Container or Nette\Forms\IControl instances.');
+				}
+				$this->validationScope[] = $control;
+				$htmlNames[] = $control->lookupPath('Nette\Forms\Form');
+			}
+		}
+
+		$this->control->formnovalidate = $this->validationScope !== NULL;
+		$this->control->data['nette-validation-scope'] = $htmlNames ? json_encode($htmlNames) : NULL;
 		return $this;
 	}
 

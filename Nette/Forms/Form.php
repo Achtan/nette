@@ -340,6 +340,23 @@ class Form extends Container
 
 
 
+	public function validate()
+	{
+		$scope = $this->submittedBy instanceof ISubmitterControl ? $this->submittedBy->getValidationScope() : NULL;
+		if ($scope === NULL)  {
+			parent::validate();
+
+		} else {
+			foreach ($scope as $control) {
+				$control->validate();
+			}
+			$this->onValidate($this);
+			$this->validated = TRUE;
+		}
+	}
+
+
+
 	/**
 	 * Tells if the form was submitted.
 	 * @return ISubmitterControl|FALSE  submittor control
@@ -406,15 +423,14 @@ class Form extends Container
 			return;
 
 		} elseif ($this->submittedBy instanceof ISubmitterControl) {
-			if (!$this->submittedBy->getValidationScope() || $this->isValid()) {
-				$this->submittedBy->click();
-				$valid = TRUE;
+			if ($this->isValid()) {
+				$this->submittedBy->onClick($this->submittedBy);
 			} else {
 				$this->submittedBy->onInvalidClick($this->submittedBy);
 			}
 		}
 
-		if (isset($valid) || $this->isValid()) {
+		if ($this->isValid()) {
 			$this->onSuccess($this);
 		} else {
 			$this->onError($this);

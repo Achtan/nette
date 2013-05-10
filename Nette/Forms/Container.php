@@ -29,14 +29,14 @@ use Nette;
  */
 class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 {
-	/** @var array of function(Form $sender); Occurs when the form is validated */
+	/** @var array of function(Container $sender); Occurs when the form is validated */
 	public $onValidate;
 
 	/** @var ControlGroup */
 	protected $currentGroup;
 
 	/** @var bool */
-	private $validated;
+	protected $validated;
 
 
 
