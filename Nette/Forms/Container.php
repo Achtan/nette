@@ -36,7 +36,7 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 	protected $currentGroup;
 
 	/** @var bool */
-	protected $validated;
+	private $validated;
 
 
 
@@ -140,11 +140,12 @@ class Container extends Nette\ComponentModel\Container implements \ArrayAccess
 
 	/**
 	 * Performs the server side validation.
+	 * @param  IControl[]
 	 * @return void
 	 */
-	public function validate()
+	public function validate(array $controls = NULL)
 	{
-		foreach ($this->getControls() as $control) {
+		foreach ($controls === NULL ? $this->getControls() : $controls as $control) {
 			$control->validate();
 		}
 		$this->onValidate($this);
